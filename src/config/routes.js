@@ -5,10 +5,14 @@ import {
   COMPANY_CREATE,
   COMPANY_EDIT,
   COMPANY_DETAILS,
+  EMPLOYEE_CREATE,
+  EMPLOYEE_DETAILS,
+  EMPLOYEE_EDIT,
 } from './path';
 import Employee from '../pages/employee';
 import Company from '../pages/company';
 import CompanyCRUD from '../pages/company/CRUD';
+import EmployeeCRUD from '../pages/employee/CRUD';
 
 const routes = [
   {
@@ -18,26 +22,41 @@ const routes = [
   },
   {
     id: 2,
+    path: EMPLOYEE_CREATE,
+    page: <EmployeeCRUD />,
+  },
+  {
+    id: 3,
+    path: EMPLOYEE_DETAILS,
+    page: <EmployeeCRUD />,
+  },
+  {
+    id: 4,
+    path: EMPLOYEE_EDIT,
+    page: <EmployeeCRUD />,
+  },
+  {
+    id: 5,
     path: COMPANY,
     page: <Company />,
   },
   {
-    id: 3,
+    id: 6,
     path: COMPANY_CREATE,
     page: <CompanyCRUD />,
   },
   {
-    id: 4,
+    id: 7,
     path: COMPANY_EDIT,
     page: <CompanyCRUD />,
   },
   {
-    id: 5,
+    id: 8,
     path: COMPANY_DETAILS,
     page: <CompanyCRUD />,
   },
   {
-    id: 6,
+    id: 9,
     path: UNKNOWN_PATH,
     page: <Employee />,
   },

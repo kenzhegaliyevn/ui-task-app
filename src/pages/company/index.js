@@ -1,11 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Space, Button } from 'antd';
-import {
-  COMPANY_CREATE,
-  COMPANY_DETAILS,
-  COMPANY_EDIT,
-} from '../../config/path';
+import { COMPANY_CREATE, EMPLOYEE } from '../../config/path';
 
 const Company = () => {
   const navigate = useNavigate();
@@ -45,6 +41,14 @@ const Company = () => {
             }}
           >
             Edit
+          </Button>
+          <Button
+            type='link'
+            onClick={() => {
+              navigate('/company/employee/2');
+            }}
+          >
+            Employee List
           </Button>
         </Space>
       ),
