@@ -1,10 +1,15 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Table, Space, Button } from 'antd';
-import { EMPLOYEE_CREATE } from '../../config/path';
+import { db } from '../../services/firebase';
+import { collection, deleteDoc, getDocs, doc } from 'firebase/firestore';
 
 const Employee = () => {
+  const [data, setData] = useState([]);
   const navigate = useNavigate();
+  const { companyId } = useParams();
+  const employeeCollectionRef = collection(db, 'employee');
+
   const columns = [
     {
       title: 'Name',
@@ -44,7 +49,7 @@ const Employee = () => {
           <Button
             type='link'
             onClick={() => {
-              navigate(`/company/employee/details/1`);
+              navigate(`/company/${companyId}/employee/details/${record.id}`);
             }}
           >
             Open
@@ -52,35 +57,41 @@ const Employee = () => {
           <Button
             type='link'
             onClick={() => {
-              navigate(`/company/employee/edit/1`);
+              navigate(`/company/${companyId}/employee/edit/${record.id}`);
             }}
           >
             Edit
+          </Button>
+          <Button
+            type='link'
+            onClick={async () => {
+              try {
+                const employeeDoc = doc(db, 'employee', record.id);
+                await deleteDoc(employeeDoc);
+                loadData();
+              } catch (error) {
+                alert('error');
+              }
+            }}
+          >
+            Delete
           </Button>
         </Space>
       ),
     },
   ];
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      address: 'New York No. 1 Lake Park',
-      country: 'USA',
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      address: 'London No. 1 Lake Park',
-      country: 'USA',
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      address: 'Sidney No. 1 Lake Park',
-      country: 'USA',
-    },
-  ];
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    const data = await getDocs(employeeCollectionRef);
+    setData(
+      data.docs.map((item) => ({ ...item.data(), id: item.id, key: item.id }))
+    );
+  };
+
   return (
     <>
       <Button
@@ -88,7 +99,7 @@ const Employee = () => {
           marginBottom: 16,
         }}
         onClick={() => {
-          navigate(EMPLOYEE_CREATE);
+          navigate(`/company/${companyId}/employee/create`);
         }}
       >
         Create Employee

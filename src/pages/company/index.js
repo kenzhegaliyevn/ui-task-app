@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Space, Button } from 'antd';
-import { COMPANY_CREATE, EMPLOYEE } from '../../config/path';
+import { COMPANY_CREATE } from '../../config/path';
+import { db } from '../../services/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 const Company = () => {
+  const [companyList, setCompanyList] = useState([]);
   const navigate = useNavigate();
+  const companyCollectionRef = collection(db, 'companies');
   const columns = [
     {
       title: 'Name',
@@ -29,7 +33,7 @@ const Company = () => {
           <Button
             type='link'
             onClick={() => {
-              navigate(`/company/details/1`);
+              navigate(`/company/details/${record.id}`);
             }}
           >
             Open
@@ -37,7 +41,7 @@ const Company = () => {
           <Button
             type='link'
             onClick={() => {
-              navigate(`/company/edit/1`);
+              navigate(`/company/edit/${record.id}`);
             }}
           >
             Edit
@@ -45,7 +49,7 @@ const Company = () => {
           <Button
             type='link'
             onClick={() => {
-              navigate('/company/employee/2');
+              navigate(`/company/${record.id}/employee`);
             }}
           >
             Employee List
@@ -54,26 +58,17 @@ const Company = () => {
       ),
     },
   ];
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      address: 'New York No. 1 Lake Park',
-      country: 'USA',
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      address: 'London No. 1 Lake Park',
-      country: 'USA',
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      address: 'Sidney No. 1 Lake Park',
-      country: 'USA',
-    },
-  ];
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    const data = await getDocs(companyCollectionRef);
+    setCompanyList(
+      data.docs.map((item) => ({ ...item.data(), id: item.id, key: item.id }))
+    );
+  };
   return (
     <>
       <Button
@@ -86,7 +81,7 @@ const Company = () => {
       >
         Create Company
       </Button>
-      <Table columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={companyList} />
     </>
   );
 };

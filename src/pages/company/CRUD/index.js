@@ -1,17 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Form, Input, Button, Row, Col } from 'antd';
+import { db } from '../../../services/firebase';
+import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { COMPANY } from '../../../config/path';
 
 const CompanyCRUD = () => {
+  const companyCollectionRef = collection(db, 'companies');
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const { pathname } = useLocation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
 
   useEffect(() => {
     setIsDisabled(pathname.includes('edit') || pathname.includes('create'));
+    setIsEdit(pathname.includes('edit'));
+    if (pathname.includes('edit') || pathname.includes('details')) {
+      loadCompanyDetails();
+    }
   }, []);
 
-  const onFinish = (values) => {
-    console.log('Success:', values);
+  const loadCompanyDetails = async () => {
+    const data = await getDoc(doc(db, 'companies', id));
+    form.setFieldsValue({
+      ...data.data(),
+    });
+  };
+
+  const onCreate = async (values) => {
+    try {
+      await addDoc(companyCollectionRef, values);
+      navigate(COMPANY);
+    } catch (error) {
+      alert('Error');
+    }
+  };
+
+  const onEdit = async (values) => {
+    try {
+      const data = doc(db, 'companies', id);
+      await updateDoc(data, values);
+      navigate(COMPANY);
+    } catch (error) {
+      alert('Error');
+    }
+  };
+
+  const onFinish = async (values) => {
+    if (!isEdit) {
+      onCreate(values);
+    } else {
+      onEdit(values);
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -20,6 +62,7 @@ const CompanyCRUD = () => {
 
   return (
     <Form
+      form={form}
       name='basic'
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}

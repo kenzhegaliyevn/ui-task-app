@@ -1,17 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Form, Input, Button, Row, Col } from 'antd';
+import { db } from '../../../services/firebase';
+import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const EmployeeCRUD = () => {
+  const employeeCollectionRef = collection(db, 'employee');
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const { pathname } = useLocation();
+  const { companyId, id } = useParams();
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
 
   useEffect(() => {
     setIsDisabled(pathname.includes('edit') || pathname.includes('create'));
+    setIsEdit(pathname.includes('edit'));
+    if (pathname.includes('edit') || pathname.includes('details')) {
+      loadEmployeeDetails();
+    }
   }, []);
 
+  const loadEmployeeDetails = async () => {
+    const data = await getDoc(doc(db, 'employee', id));
+    form.setFieldsValue({
+      ...data.data(),
+    });
+  };
+
+  const onCreate = async (values) => {
+    try {
+      await addDoc(employeeCollectionRef, { ...values, companyId });
+      navigate(`/company/employee/${companyId}`);
+    } catch (error) {
+      alert('Error');
+    }
+  };
+
+  const onEdit = async (values) => {
+    try {
+      const data = doc(db, 'employee', id);
+      await updateDoc(data, values);
+      navigate(`/company/employee/${companyId}`);
+    } catch (error) {
+      alert('Error');
+    }
+  };
+
   const onFinish = (values) => {
-    console.log('Success:', values);
+    if (!isEdit) {
+      onCreate(values);
+    } else {
+      onEdit(values);
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -24,6 +65,7 @@ const EmployeeCRUD = () => {
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
       layout={'vertical'}
+      form={form}
     >
       <Row gutter={24}>
         <Col span={6}>
@@ -56,8 +98,8 @@ const EmployeeCRUD = () => {
         </Col>
         <Col span={6}>
           <Form.Item
-            label='Monthly salary '
-            name='monthlySalary '
+            label='Monthly salary'
+            name='monthlySalary'
             rules={[
               {
                 required: true,
@@ -70,8 +112,8 @@ const EmployeeCRUD = () => {
         </Col>
         <Col span={6}>
           <Form.Item
-            label='Early salary '
-            name='early salary '
+            label='Early salary'
+            name='earlySalary'
             rules={[
               {
                 required: true,
@@ -86,8 +128,8 @@ const EmployeeCRUD = () => {
       <Row gutter={24}>
         <Col span={6}>
           <Form.Item
-            label='Taxes paid by company '
-            name='taxesPaidByCompany '
+            label='Taxes paid by company'
+            name='taxesPaidByCompany'
             rules={[
               {
                 required: true,

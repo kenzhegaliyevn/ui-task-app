@@ -1,7 +1,7 @@
-export const EMPLOYEE = '/company/employee/:id';
-export const EMPLOYEE_CREATE = '/company/employee/create';
-export const EMPLOYEE_DETAILS = '/company/employee/details/:id';
-export const EMPLOYEE_EDIT = '/company/employee/edit/:id';
+export const EMPLOYEE = '/company/:companyId/employee';
+export const EMPLOYEE_CREATE = '/company/:companyId/employee/create';
+export const EMPLOYEE_DETAILS = '/company/:companyId/employee/details/:id';
+export const EMPLOYEE_EDIT = '/company/:companyId/employee/edit/:id';
 
 export const COMPANY = '/company';
 export const COMPANY_CREATE = '/company/create';
